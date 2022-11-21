@@ -132,6 +132,13 @@ bool ConversionFixItGenerator::tryToFixConversion(const Expr *FullExpr,
     if (!Expr->isLValue() || Expr->getObjectKind() != OK_Ordinary)
       return false;
 
+    // Do no take address of const pointer to get void*
+    const PointerType *FromPtrTy = dyn_cast<PointerType>(FromQTy);
+    const PointerType *ToPtrTy = dyn_cast<PointerType>(ToQTy);
+    if (FromPtrTy && FromPtrTy->getPointeeType().isConstQualified() &&
+        ToPtrTy->isVoidPointerType())
+      return false;
+
     CanConvert = CompareTypes(S.Context.getPointerType(FromQTy), ToQTy, S,
                               Begin, VK_PRValue);
     if (CanConvert) {

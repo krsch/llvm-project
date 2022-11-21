@@ -115,4 +115,16 @@ void dbcaller(A *ptra, B *ptrb, C &c, B &refb) {
   u(c);
 }
 
+void accept_void(void*);
+
+void issue58958(const char* a) {
+// CHECK: no matching function for call to 'accept_void'
+// CHECK-NOT: take the address of the argument with &
+    accept_void(a);
+    char b;
+// CHECK: no matching function for call to 'accept_void'
+// CHECK: take the address of the argument with &
+    accept_void(b);
+}
+
 // CHECK: errors generated
